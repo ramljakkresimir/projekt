@@ -19,10 +19,10 @@ void rezIspis(const char* imeDatLinije, const char* imeDatKupci) {
 
 }
 
-void ispisLinija(const char* imeDat) {
+void ispisLinija(const char* imeDatLinije) {
 
-	LINIJE* autobusi = procitajLinijeIzDatoteke(imeDat);
-	int brojLinija = procitajBrojLinija(imeDat);
+	LINIJE* autobusi = procitajLinijeIzDatoteke(imeDatLinije);
+	int brojLinija = procitajBrojLinija(imeDatLinije);
 
 
 	for (int i = 0; i < brojLinija; i++) {

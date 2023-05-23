@@ -8,7 +8,7 @@
 int izbornik(void) {
 	int korisnickiOdabir;
 
-	const char* imeDatLinije = "linije.txt";
+	const char* imeDatLinije = "linije.bin";
 	const char* imeDatKupci = "kupci.bin";
 
 	printf("=================================\n");
@@ -32,7 +32,7 @@ int izbornik(void) {
 
 	switch (korisnickiOdabir) {
 	case 1:
-		rez_ispis(imeDatLinije, imeDatKupci);
+		rezIspis(imeDatLinije, imeDatKupci);
 		break;
 	case 2:
 		ispisBrojaSjedala(imeDatLinije);

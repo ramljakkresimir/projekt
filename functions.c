@@ -61,9 +61,9 @@ LINIJE* procitajLinijeIzDatoteke(const char* imeDatLinije) {
 	return autobusi;
 }
 
-int procitajBrojLinija(const char* imeDat) {
+int procitajBrojLinija(const char* imeDatLinije) {
 	int brojLinija;
-	FILE* linije = fopen(imeDat, "rb");
+	FILE* linije = fopen(imeDatLinije, "rb");
 	if (linije == NULL) exit(EXIT_FAILURE);
 
 	fread(&brojLinija, sizeof(int), 1, linije);

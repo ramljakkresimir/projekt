@@ -1,7 +1,7 @@
 #ifndef HEADER_H
 #define HEADER_H
 
-typedef struct korisnik
+typedef struct korisnik		//3	//10
 {
 	char ime[20];
 	char prezime[20];
@@ -22,7 +22,7 @@ void unosLinija(const char* imeDat);
 
 int izbornik();
 
-void rezIspis(const char* imeDatLinije, const char* imeDatKupci);
+void rezIspis(const char* imeDatLinije, const char* imeDatKupci);	//4
 void ispisLinija(const char* imeDat);
 
 LINIJE* procitajLinijeIzDatoteke(const char* imeDatLinije);

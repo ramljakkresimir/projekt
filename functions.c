@@ -32,7 +32,7 @@ void rezIspis(const char* imeDatLinije, const char* imeDatKupci) {
 
 void ispisLinija(const char* imeDatLinije) {
 	int brojLinije=0;
-	LINIJE* autobusi = procitajLinijeIzDatoteke(imeDatLinije, &brojLinije);
+	LINIJE* autobusi = procitajLinijeIzDatoteke(imeDatLinije, &brojLinije);		//9
 	//= procitajBrojLinija(imeDatLinije);
 
 

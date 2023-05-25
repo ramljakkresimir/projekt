@@ -4,7 +4,7 @@
 #include <string.h>
 #include "header.h"
 
-static int brojLinija = 0;
+//static int brojLinija = 0;
 
 //void kreiranjeDatoteke(const char* const imeDatLinije) {
 //	FILE* pF = fopen(imeDatLinije, "wb");
@@ -52,7 +52,7 @@ void ispisLinija(const char* imeDatLinije) {
 		printf("\n");
 	}
 
-	free(autobusi);									//14
+	free(autobusi);									//15
 }
 
 LINIJE* procitajLinijeIzDatoteke(const char* imeDatLinije, int *brojLinije) {

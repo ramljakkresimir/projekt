@@ -8,10 +8,10 @@
 int izbornik(void) {
 	int korisnickiOdabir;
 
-	const char* imeDatLinije = "linije.bin";
-	const char* imeDatKupci = "kupci.bin";
+	const char* imeDatLinije = "linije.txt";
+	const char* imeDatKupci = "kupci.bin"
 
-	printf("=================================\n");
+	printf("=================================\n");		//8
 	printf("|-------------------------------|\n");
 	printf("|      Autobusni kolodvor     |\n");
 	printf("|-------------------------------|\n");

@@ -4,23 +4,13 @@
 #include <string.h>
 #include "header.h"
 
-//static int brojLinija = 0;
 
-//void kreiranjeDatoteke(const char* const imeDatLinije) {
-//	FILE* pF = fopen(imeDatLinije, "wb");
-//	if (pF == NULL) {
-//		perror("Kreiranje datoteke linije.txt");
-//		exit(EXIT_FAILURE);
-//	}
-//	fwrite(&brojLinija, sizeof(int), 1, pF);
-//	fclose(pF);
-//}
 void rezIspis(const char* imeDatLinije, const char* imeDatKupci) {
 	system("cls");
 
 	ispisLinija(imeDatLinije);
 
-	int odabir;
+	static int odabir;					//5
 	do {
 		printf("Unesi broj linije: ");
 		scanf("%d", &odabir);
@@ -31,7 +21,7 @@ void rezIspis(const char* imeDatLinije, const char* imeDatKupci) {
 }
 
 void ispisLinija(const char* imeDatLinije) {
-	int brojLinije=0;
+	int brojLinije = 0;
 	LINIJE* autobusi = procitajLinijeIzDatoteke(imeDatLinije, &brojLinije);		//9
 	//= procitajBrojLinija(imeDatLinije);
 
@@ -55,7 +45,7 @@ void ispisLinija(const char* imeDatLinije) {
 	free(autobusi);									//15
 }
 
-LINIJE* procitajLinijeIzDatoteke(const char* imeDatLinije, int *brojLinije) {
+LINIJE* procitajLinijeIzDatoteke(const char* imeDatLinije, int* brojLinije) {
 	FILE* linije = fopen(imeDatLinije, "r");
 	if (linije == NULL) exit(EXIT_FAILURE);
 
@@ -65,7 +55,7 @@ LINIJE* procitajLinijeIzDatoteke(const char* imeDatLinije, int *brojLinije) {
 	int n = *brojLinije;
 	LINIJE* autobusi = (LINIJE*)malloc(n * sizeof(LINIJE));  //14
 	if (autobusi == NULL) exit(EXIT_FAILURE);
-	for (int i = 0; i <n; i++)
+	for (int i = 0; i < n; i++)
 	{
 		//32 zagreb hrvatska 12 62.0
 		fscanf(linije, "%d %s %s %d %f", &autobusi[i].idPutovanja, autobusi[i].ime, autobusi[i].drzava, &autobusi[i].brojSlobodnihMjesta, &autobusi[i].cijena);
@@ -118,19 +108,19 @@ void zapisiPutnikaUDatoteku(KORISNIK* kupac, const char* imeDatKupci) {
 
 		int brojKorisnika;
 
-		FILE* korisnici = fopen(imeDatKupci, "rb");
+		FILE* korisnici = fopen(imeDatKupci, "r");
 		if (korisnici == NULL) exit(EXIT_FAILURE);
 
 		fread(&brojKorisnika, sizeof(int), 1, korisnici);
 
-		KORISNIK* sviKorisnici = (KORISNIK*)malloc(brojKorisnika * sizeof(KORISNIK));
+		KORISNIK* sviKorisnici = (KORISNIK*)malloc(brojKorisnika * sizeof(KORISNIK));		//13
 		if (sviKorisnici == NULL) exit(EXIT_FAILURE);
 
 		fread(sviKorisnici, sizeof(KORISNIK), brojKorisnika, korisnici);
 
 		fclose(korisnici);
 
-		korisnici = fopen(imeDatKupci, "wb");
+		korisnici = fopen(imeDatKupci, "w");
 
 		brojKorisnika++;
 
@@ -144,7 +134,7 @@ void zapisiPutnikaUDatoteku(KORISNIK* kupac, const char* imeDatKupci) {
 
 	}
 	else {
-		FILE* korisnici = fopen(imeDatKupci, "wb");
+		FILE* korisnici = fopen(imeDatKupci, "w");
 		if (korisnici == NULL) exit(EXIT_FAILURE);
 		int broj = 1;
 		fwrite(&broj, sizeof(int), 1, korisnici);
@@ -154,7 +144,7 @@ void zapisiPutnikaUDatoteku(KORISNIK* kupac, const char* imeDatKupci) {
 }
 
 void zapisiLinije(LINIJE* autobusi, int brojLinija, const char* imeDatLinije) {
-	FILE* linije = fopen(imeDatLinije, "wb");
+	FILE* linije = fopen(imeDatLinije, "w");
 	if (linije == NULL) exit(EXIT_FAILURE);
 
 	fwrite(&brojLinija, sizeof(int), 1, linije);
@@ -187,15 +177,16 @@ void unosLinija(const char* imeDat) {
 
 		printf("Unesi ime linije: ");
 		scanf("%64s", autobusi[i].ime);
-
+		getchar();								//7
 		printf("Unesi drzavu linije: ");
 		scanf("%64s", autobusi[i].drzava);
-
+		getchar();
 		printf("Unesi broj slobodnih mjesta linije: ");
 		scanf("%d", &autobusi[i].brojSlobodnihMjesta);
-
+		getchar();
 		printf("Unesi cijenu linije: ");
 		scanf("%f", &autobusi[i].cijena);
+		getchar();
 	}
 
 	FILE* linijeData = fopen(imeDat, "wb");
@@ -206,17 +197,17 @@ void unosLinija(const char* imeDat) {
 	fwrite(autobusi, sizeof(LINIJE), brojLinija, linijeData);
 
 	fclose(linijeData);
-	free(autobusi);													//14
+	free(autobusi);													
 }
 
 void ispisBrojaSjedala(const char* imeDatLinije) {
 	int brojLinija = procitajBrojLinija(imeDatLinije);
 	LINIJE* autobusi = procitajLinijeIzDatoteke(imeDatLinije, &brojLinija);
-	
+
 
 	int i;
 	for (i = 0; i < brojLinija; i++) {
-		printf("\nAutobus %d - %d\n", i, autobusi[i].brojSlobodnihMjesta);
+		printf("\nAutobus %d - %d\n", i+1, autobusi[i].brojSlobodnihMjesta);
 	}
 
 	system("pause");
@@ -254,7 +245,7 @@ void odjava(const char* imeDatLinije, const char* imeDatKupci) {
 	unesiPodatkeKorisnika(&kupac);
 	int brojLinija = procitajBrojLinija(imeDatLinije);
 	LINIJE* autobusi = procitajLinijeIzDatoteke(imeDatLinije, &brojLinija);
-	
+
 	KORISNIK* kupci = procitajKorisnikeIzDatoteke(imeDatKupci);
 	int brojKorisnika = procitajBrojKorisnika(imeDatKupci);
 

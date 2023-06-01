@@ -10,9 +10,7 @@
 int main()
 {
 
-	//unosLinija(imeDatLinije);
-
-	int uvijet = 1;
+	int uvijet = 1;		//6
 
 	while (uvijet) {
 		uvijet = izbornik();

@@ -1,2 +1,6 @@
-1
-32 zagreb hrvatska 12 62.0
+5
+1 Zagreb-Osijek Hrvatska 11 18.0
+2 Zagreb-Split Hrvatska 3 26.0
+3 Zagreb-Zadar Hrvatska 14 15.0
+4 Zagreb-Rijeka Hrvatska 5 11.0
+5 Zagreb-Pula Hrvatska 16 17.0

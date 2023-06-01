@@ -1,17 +1,17 @@
 #ifndef HEADER_H
 #define HEADER_H
 
-typedef struct korisnik		//3	//10
+typedef struct korisnik		//3	
 {
 	char ime[20];
-	char prezime[20];
+	char prezime[20];		//2
 	int idPutovanja;
 }KORISNIK;
 
 
-typedef struct linije {
+typedef struct linije {			//10
 	int idPutovanja;
-	char ime[64];
+	char ime[64];				//1
 	char drzava[64];
 	int brojSlobodnihMjesta;
 	float cijena;
@@ -45,4 +45,3 @@ void obrisi(KORISNIK* kupac, const char* imeDatKupci);
 
 void izlaz();
 #endif // HEADER_H
-

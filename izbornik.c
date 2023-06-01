@@ -8,7 +8,7 @@
 int izbornik(void) {
 	int korisnickiOdabir;
 
-	const char* imeDatLinije = "linije.txt";
+	const char* imeDatLinije = "linije.txt";	//16
 	const char* imeDatKupci = "kupci.bin"
 
 	printf("=================================\n");		//8

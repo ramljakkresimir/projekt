@@ -1,6 +1,6 @@
 5
-1 Zagreb-Osijek Hrvatska 11 18.0
-2 Zagreb-Split Hrvatska 3 26.0
-3 Zagreb-Zadar Hrvatska 14 15.0
-4 Zagreb-Rijeka Hrvatska 5 11.0
-5 Zagreb-Pula Hrvatska 16 17.0
+1 Zagreb-Osijek Hrvatska 11 18.0 07.00
+2 Zagreb-Split Hrvatska 3 26.0 09.00
+3 Zagreb-Zadar Hrvatska 14 15.0 12.00
+4 Zagreb-Rijeka Hrvatska 5 11.0 13.30
+5 Zagreb-Pula Hrvatska 16 17.0 15.00

@@ -12,9 +12,9 @@ int izbornik(void) {
 	const char* imeDatKupci = "kupci.txt";
 
 	printf("=================================\n");		//8
-	printf("|-------------------------------|\n");
-	printf("|      Autobusni kolodvor     |\n");
-	printf("|-------------------------------|\n");
+	printf("=================================\n");
+	printf("|      Autobusni kolodvor       |\n");
+	printf("=================================\n");
 	printf("=================================\n\n");
 	printf("%d. Ispis linija\n", 1);
 	printf("%d. Rezervacija karata\n", 2);

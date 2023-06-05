@@ -9,18 +9,18 @@ int izbornik(void) {
 	int korisnickiOdabir;
 
 	const char* imeDatLinije = "linije.txt";	//16
-	const char* imeDatKupci = "kupci.bin"
+	const char* imeDatKupci = "kupci.txt";
 
 	printf("=================================\n");		//8
 	printf("|-------------------------------|\n");
 	printf("|      Autobusni kolodvor     |\n");
 	printf("|-------------------------------|\n");
 	printf("=================================\n\n");
-	printf("%d. Rezervacija karata\n", 1);
-	printf("%d. Ispis broja sjedala\n", 2);
-	printf("%d. Pretrazivanje\n", 3);
+	printf("%d. Ispis linija\n", 1);
+	printf("%d. Rezervacija karata\n", 2);
+	printf("%d. Ispis broja slobodnih sjedala\n", 3);
 	printf("%d. Odjava rezervacije\n", 4);
-	printf("%d. Ispis linija\n", 5);
+	printf("%d. Pretrazivanje\n", 5);
 	printf("%d. Izlaz\n", 6);
 	printf("Vas odabir:  ");
 	do {
@@ -32,26 +32,21 @@ int izbornik(void) {
 
 	switch (korisnickiOdabir) {
 	case 1:
-		rezIspis(imeDatLinije, imeDatKupci);
+		ispisLinija(imeDatLinije);
 		break;
+
 	case 2:
+		unesiPodatkeIKupiKartu(imeDatKupci);
+		break;
+
+	case 3:
 		ispisBrojaSjedala(imeDatLinije);
 		break;
-	case 3: {
-		KORISNIK* trazeni = pretrazivanje(imeDatKupci);
-		if (trazeni == NULL) {
-			printf("\nTrazeni kupac se ne nalazi u datoteci.\n\n");
-		}
-		else {
-			printf("\n%s %s se nalazi u kupcima i putuje s linijom %d.\n\n", trazeni->ime, trazeni->prezime, trazeni->idPutovanja);
-		}
-		break;
-	}
 	case 4:
-		odjava(imeDatLinije, imeDatKupci);
+		odjaviKupca(imeDatKupci);
 		break;
 	case 5:
-		ispisLinija(imeDatLinije);
+		pretraziKupce(imeDatKupci);
 		break;
 	case 6:
 		izlaz();

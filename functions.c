@@ -4,24 +4,8 @@
 #include <string.h>
 #include "header.h"
 
-
-void rezIspis(const char* imeDatLinije, const char* imeDatKupci) {
-	system("cls");
-
-	ispisLinija(imeDatLinije);
-
-	static int odabir;					//5
-	do {
-		printf("Unesi broj linije: ");
-		scanf("%d", &odabir);
-	} while (odabir < 0 || odabir > 5);
-
-	rezervacija(odabir, imeDatLinije, imeDatKupci);
-
-}
-
 void ispisLinija(const char* imeDatLinije) {
-	int brojLinije = 0;
+	static int brojLinije = 0;		//5
 	LINIJE* autobusi = procitajLinijeIzDatoteke(imeDatLinije, &brojLinije);		//9
 	//= procitajBrojLinija(imeDatLinije);
 
@@ -37,7 +21,9 @@ void ispisLinija(const char* imeDatLinije) {
 
 		printf("Broj slobodnih mjesta linije: %d\n", autobusi[i].brojSlobodnihMjesta);
 
-		printf("Cijena linije: %.2f\n", autobusi[i].cijena);
+		printf("Cijena linije: %.2f $\n", autobusi[i].cijena);
+
+		printf("Vrijeme polaska linije: %.2f\n", autobusi[i].vrijemePolaska);
 
 		printf("\n");
 	}
@@ -47,26 +33,43 @@ void ispisLinija(const char* imeDatLinije) {
 
 LINIJE* procitajLinijeIzDatoteke(const char* imeDatLinije, int* brojLinije) {
 	FILE* linije = fopen(imeDatLinije, "r");
-	if (linije == NULL) exit(EXIT_FAILURE);
+	if (linije == NULL) {
+		perror("Pogreska pri otvaranju datoteke");
+		exit(EXIT_FAILURE);
+	}
 
-	//int brojLinija;
+	errno = 0;
 	fscanf(linije, "%d", brojLinije);
-	//fread(&brojLinija, sizeof(int), 1, linije);
+	if (errno != 0) {											//19
+		perror("Pogreska pri citanju broja linija iz datoteke");
+		exit(EXIT_FAILURE);
+	}
+
 	int n = *brojLinije;
-	LINIJE* autobusi = (LINIJE*)malloc(n * sizeof(LINIJE));  //14
-	if (autobusi == NULL) exit(EXIT_FAILURE);
+	LINIJE* autobusi = (LINIJE*)malloc(n * sizeof(LINIJE));		//13
+	if (autobusi == NULL) {										//14
+		perror("Pogreska pri alokaciji memorije");
+		exit(EXIT_FAILURE);
+	}
+
 	for (int i = 0; i < n; i++)
 	{
-		//32 zagreb hrvatska 12 62.0
-		fscanf(linije, "%d %s %s %d %f", &autobusi[i].idPutovanja, autobusi[i].ime, autobusi[i].drzava, &autobusi[i].brojSlobodnihMjesta, &autobusi[i].cijena);
+		errno = 0;
+		int res = fscanf(linije, "%d %s %s %d %f %f", &autobusi[i].idPutovanja, autobusi[i].ime, autobusi[i].drzava, &autobusi[i].brojSlobodnihMjesta, &autobusi[i].cijena, &autobusi[i].vrijemePolaska);
+		if (errno != 0) {
+			perror("Pogreska pri citanju linije iz datoteke");
+			exit(EXIT_FAILURE);
+		}
+		if (res != 6) {
+			fprintf(stderr, "Greska: neispravan format linije u datoteci\n");
+			exit(EXIT_FAILURE);
+		}
 	}
-	//fread(autobusi, sizeof(LINIJE), brojLinija, linije);
 
 	fclose(linije);
 
 	return autobusi;
 }
-
 int procitajBrojLinija(const char* imeDatLinije) {
 	int brojLinija;
 	FILE* linije = fopen(imeDatLinije, "r");
@@ -79,127 +82,6 @@ int procitajBrojLinija(const char* imeDatLinije) {
 	return brojLinija;
 }
 
-void rezervacija(int odabir, const char* imeDatLinije, const char* imeDatKupci)
-{
-	KORISNIK kupac;
-	unesiPodatkeKorisnika(&kupac);
-	kupac.idPutovanja = odabir;
-
-	int brojLinija = procitajBrojLinija(imeDatLinije);
-	LINIJE* autobusi = procitajLinijeIzDatoteke(imeDatLinije, &brojLinija);
-
-	for (int i = 0; i < brojLinija; i++) {
-		if (odabir == autobusi[i].idPutovanja) {
-			autobusi[i].brojSlobodnihMjesta--;
-			zapisiPutnikaUDatoteku(&kupac, imeDatKupci);
-			zapisiLinije(autobusi, brojLinija, imeDatLinije);
-		}
-	}
-}
-
-int postojiDat(const char* imeDatKupci) {
-	if (fopen(imeDatKupci, "rb") == NULL) return 0;
-	else return 1;
-}
-
-void zapisiPutnikaUDatoteku(KORISNIK* kupac, const char* imeDatKupci) {
-
-	if (postojiDat(imeDatKupci)) {
-
-		int brojKorisnika;
-
-		FILE* korisnici = fopen(imeDatKupci, "r");
-		if (korisnici == NULL) exit(EXIT_FAILURE);
-
-		fread(&brojKorisnika, sizeof(int), 1, korisnici);
-
-		KORISNIK* sviKorisnici = (KORISNIK*)malloc(brojKorisnika * sizeof(KORISNIK));		//13
-		if (sviKorisnici == NULL) exit(EXIT_FAILURE);
-
-		fread(sviKorisnici, sizeof(KORISNIK), brojKorisnika, korisnici);
-
-		fclose(korisnici);
-
-		korisnici = fopen(imeDatKupci, "w");
-
-		brojKorisnika++;
-
-		fwrite(&brojKorisnika, sizeof(int), 1, korisnici);
-
-		fwrite(sviKorisnici, sizeof(KORISNIK), brojKorisnika - 1, korisnici);
-
-		fwrite(kupac, sizeof(KORISNIK), 1, korisnici);
-
-		fclose(korisnici);
-
-	}
-	else {
-		FILE* korisnici = fopen(imeDatKupci, "w");
-		if (korisnici == NULL) exit(EXIT_FAILURE);
-		int broj = 1;
-		fwrite(&broj, sizeof(int), 1, korisnici);
-		fwrite(kupac, sizeof(KORISNIK), 1, korisnici);
-		fclose(korisnici);
-	}
-}
-
-void zapisiLinije(LINIJE* autobusi, int brojLinija, const char* imeDatLinije) {
-	FILE* linije = fopen(imeDatLinije, "w");
-	if (linije == NULL) exit(EXIT_FAILURE);
-
-	fwrite(&brojLinija, sizeof(int), 1, linije);
-	fwrite(autobusi, sizeof(LINIJE), brojLinija, linije);
-
-	fclose(linije);
-}
-
-void unesiPodatkeKorisnika(KORISNIK* kupac) {
-	printf("Unesite svoje ime: ");
-	scanf("%s", kupac->ime);
-	printf("Unesite svoje prezime: ");
-	scanf("%s", kupac->prezime);
-	printf("Unesite broj linije: ");
-	scanf("%d", &kupac->idPutovanja);
-}
-
-
-void unosLinija(const char* imeDat) {
-	printf("Unesi broj linija: ");
-	int brojLinija;
-	scanf("%d", &brojLinija);
-
-	LINIJE* autobusi = (LINIJE*)malloc(brojLinija * sizeof(LINIJE));  //14
-	if (autobusi == NULL) exit(EXIT_FAILURE);
-
-	for (int i = 0; i < brojLinija; i++) {
-
-		autobusi[i].idPutovanja = i;
-
-		printf("Unesi ime linije: ");
-		scanf("%64s", autobusi[i].ime);
-		getchar();								//7
-		printf("Unesi drzavu linije: ");
-		scanf("%64s", autobusi[i].drzava);
-		getchar();
-		printf("Unesi broj slobodnih mjesta linije: ");
-		scanf("%d", &autobusi[i].brojSlobodnihMjesta);
-		getchar();
-		printf("Unesi cijenu linije: ");
-		scanf("%f", &autobusi[i].cijena);
-		getchar();
-	}
-
-	FILE* linijeData = fopen(imeDat, "wb");
-	if (linijeData == NULL) exit(EXIT_FAILURE);
-
-	fwrite(&brojLinija, sizeof(int), 1, linijeData);
-
-	fwrite(autobusi, sizeof(LINIJE), brojLinija, linijeData);
-
-	fclose(linijeData);
-	free(autobusi);													
-}
-
 void ispisBrojaSjedala(const char* imeDatLinije) {
 	int brojLinija = procitajBrojLinija(imeDatLinije);
 	LINIJE* autobusi = procitajLinijeIzDatoteke(imeDatLinije, &brojLinija);
@@ -207,145 +89,126 @@ void ispisBrojaSjedala(const char* imeDatLinije) {
 
 	int i;
 	for (i = 0; i < brojLinija; i++) {
-		printf("\nAutobus %d - %d\n", i+1, autobusi[i].brojSlobodnihMjesta);
+		printf("\nAutobus %d - %d\n", i + 1, autobusi[i].brojSlobodnihMjesta);
 	}
 
 	system("pause");
 	system("cls");
 }
-
-KORISNIK* pretrazivanje(const char* imeDatKupci) {		//pretrazivanje	
-
-	KORISNIK* kupac = (KORISNIK*)malloc(sizeof(KORISNIK));
-	if (kupac == NULL) exit(EXIT_FAILURE);
-	unesiPodatkeKorisnika(kupac);
-
-	FILE* kupci = fopen(imeDatKupci, "rb");
-	if (kupci == NULL) exit(EXIT_FAILURE);
-
-	KORISNIK usporedba;
-
-	int brojKupaca;
-	fread(&brojKupaca, sizeof(int), 1, kupci);
-
-	while ((fread(&usporedba, sizeof(KORISNIK), 1, kupci)) != 0) {
-		if (!strcmp(usporedba.ime, kupac->ime) && !strcmp(usporedba.prezime, kupac->prezime) && usporedba.idPutovanja == kupac->idPutovanja) {
-			fclose(kupci);
-			return kupac;
-		}
-	}
-
-	fclose(kupci);
-	return NULL;
-}
-
-void odjava(const char* imeDatLinije, const char* imeDatKupci) {
-
-	KORISNIK kupac;
-	unesiPodatkeKorisnika(&kupac);
-	int brojLinija = procitajBrojLinija(imeDatLinije);
-	LINIJE* autobusi = procitajLinijeIzDatoteke(imeDatLinije, &brojLinija);
-
-	KORISNIK* kupci = procitajKorisnikeIzDatoteke(imeDatKupci);
-	int brojKorisnika = procitajBrojKorisnika(imeDatKupci);
-
-	if (kupacPostoji(&kupac, kupci, brojKorisnika)) {
-		for (int i = 0; i < brojLinija; i++) {
-			if (autobusi[i].idPutovanja == kupac.idPutovanja) {
-				autobusi[i].brojSlobodnihMjesta++;
-			}
-		}
-		zapisiLinije(autobusi, brojLinija, imeDatLinije);
-
-		obrisi(&kupac, imeDatKupci);
-
-		printf("\nKupac uspjesno obrisan.\n\n");
-	}
-	else {
-		printf("\nKupac ne postoji.\n\n");
-	}
-}
-
-int kupacPostoji(KORISNIK* trazeni, KORISNIK* sviKorisnici, int brojKorisnika) {
-	int i;
-	for (i = 0; i < brojKorisnika; i++) {
-		if (!strcmp(trazeni->ime, sviKorisnici[i].ime) && !strcmp(trazeni->prezime, sviKorisnici[i].prezime) && trazeni->idPutovanja == sviKorisnici[i].idPutovanja) {
-			return 1;
-		}
-	}
-	return 0;
-}
-
-int procitajBrojKorisnika(const char* imeDatKupci) {
-	FILE* kupciDat = fopen(imeDatKupci, "rb");
-	if (kupciDat == NULL) exit(EXIT_FAILURE);
-
-	int brojKupaca;
-
-	fread(&brojKupaca, sizeof(int), 1, kupciDat);
-
-	fclose(kupciDat);
-	return brojKupaca;
-}
-
-KORISNIK* procitajKorisnikeIzDatoteke(const char* imeDatKupci) {
-	FILE* kupciDat = fopen(imeDatKupci, "rb");
-	if (kupciDat == NULL) exit(EXIT_FAILURE);
-
-	int brojKupaca;
-	fread(&brojKupaca, sizeof(int), 1, kupciDat);
-
-	KORISNIK* kupci = (KORISNIK*)malloc(brojKupaca * sizeof(KORISNIK));			//14
-	if (kupci == NULL) exit(EXIT_FAILURE);
-
-	fread(kupci, sizeof(KORISNIK), brojKupaca, kupciDat);
-
-	fclose(kupciDat);
-	return kupci;
-}
-
-void obrisi(KORISNIK* kupac, const char* imeDatKupci) {
-	FILE* kupci = fopen(imeDatKupci, "rb");
-	if (kupci == NULL) exit(EXIT_FAILURE);
-
-	FILE* noviKupci = fopen("kupciKopija.bin", "wb");
-	if (noviKupci == NULL) exit(EXIT_FAILURE);
-
-	KORISNIK usporedba;
-
-	int brojKupaca;
-	fread(&brojKupaca, sizeof(int), 1, kupci);
-	brojKupaca--;
-
-	fwrite(&brojKupaca, sizeof(int), 1, noviKupci);
-
-	while ((fread(&usporedba, sizeof(KORISNIK), 1, kupci)) != 0) {
-		if (!(!strcmp(usporedba.ime, kupac->ime) && !strcmp(usporedba.prezime, kupac->prezime) && usporedba.idPutovanja == kupac->idPutovanja)) {
-			fwrite(&usporedba, sizeof(KORISNIK), 1, noviKupci);
-		}
-	}
-
-	fclose(noviKupci);
-	fclose(kupci);
-
-
-	noviKupci = fopen("kupciKopija.bin", "rb");
-	if (noviKupci == NULL) exit(EXIT_FAILURE);
-
-	kupci = fopen(imeDatKupci, "wb");
-	if (kupci == NULL) exit(EXIT_FAILURE);
-
-	fread(&brojKupaca, sizeof(int), 1, noviKupci);
-	fwrite(&brojKupaca, sizeof(int), 1, kupci);
-	while ((fread(&usporedba, sizeof(KORISNIK), 1, noviKupci) != 0)) {
-		fwrite(&usporedba, sizeof(KORISNIK), 1, kupci);
-	}
-
-	fclose(noviKupci);
-	fclose(kupci);
-}
-
 void izlaz(void) {
 	exit(EXIT_SUCCESS);
 	return 0;
+}
+void unesiPodatkeIKupiKartu(const char* imeDatKupci) {
+	KORISNIK kupac;
+	printf("Unesite svoje ime: ");
+	scanf("%s", kupac.ime);
+	printf("Unesite svoje prezime: ");
+	scanf("%s", kupac.prezime);
+	printf("Unesite broj linije: ");
+	scanf("%d", &kupac.idPutovanja);
+
+	FILE* dat = fopen(imeDatKupci, "a");
+	if (dat == NULL) {
+		printf("Pogreska pri otvaranju datoteke %s.\n", imeDatKupci);
+		return;
+	}
+	fprintf(dat, "%s %s %d\n", kupac.ime, kupac.prezime, kupac.idPutovanja);
+	fclose(dat);
+
+	printf("Uspjesno ste kupili kartu!\n");
+}
+void pretraziKupce(const char* imeDatKupci) {
+	char ime[50], prezime[50];
+	printf("Unesite ime kupca: ");
+	scanf("%s", ime);
+	printf("Unesite prezime kupca: ");
+	scanf("%s", prezime);
+
+	FILE* dat = fopen(imeDatKupci, "r");
+	if (dat == NULL) {
+		printf("Pogreska pri otvaranju datoteke %s.\n", imeDatKupci);
+		return;
+	}
+
+	char imeDat[50], prezimeDat[50];
+	int idPutovanja;
+	while (fscanf(dat, "%s %s %d", imeDat, prezimeDat, &idPutovanja) == 3) {
+		if (strcmp(ime, imeDat) == 0 && strcmp(prezime, prezimeDat) == 0) {
+			printf("Kupac %s %s je rezervirao kartu i putuje %d linijom.\n", ime, prezime, idPutovanja);
+			fclose(dat);
+			return;
+		}
+	}
+
+	printf("Kupac %s %s nije pronađen.\n", ime, prezime);
+	fclose(dat);
+}
+void odjaviKupca(const char* imeDatKupci) {
+	char ime[50], prezime[50];
+	printf("Unesite ime kupca kojeg zelite odjaviti: ");
+	scanf("%s", ime);
+	printf("Unesite prezime kupca kojeg zelite odjaviti: ");
+	scanf("%s", prezime);
+
+	FILE* ulaz = fopen(imeDatKupci, "r");
+	if (ulaz == NULL) {
+		printf("Pogreska pri otvaranju datoteke %s.\n", imeDatKupci);
+		return;
+	}
+
+	char imeDat[50], prezimeDat[50];
+	int idPutovanja;
+	long pozicija = -1L;
+	while (fscanf(ulaz, "%s %s %d", imeDat, prezimeDat, &idPutovanja) == 3) {
+		if (strcmp(ime, imeDat) == 0 && strcmp(prezime, prezimeDat) == 0) {
+			pozicija = ftell(ulaz) - strlen(imeDat) - strlen(prezimeDat) - 3;
+			break;
+		}
+	}
+
+	fclose(ulaz);
+
+	if (pozicija == -1L) {
+		printf("Kupac %s %s nije pronadjen u datoteci %s.\n", ime, prezime, imeDatKupci);
+		return;
+	}
+
+	FILE* izlaz = fopen("temp.txt", "w");
+	if (izlaz == NULL) {
+		printf("Pogreska pri otvaranju datoteke temp.txt.\n");
+		return;
+	}
+
+	ulaz = fopen(imeDatKupci, "r");
+	if (ulaz == NULL) {
+		printf("Pogreska pri otvaranju datoteke %s.\n", imeDatKupci);
+		fclose(izlaz);
+		remove("temp.txt");
+		return;
+	}
+
+	char linija[100];
+	long trenutnaPozicija = 0L;
+	while (fgets(linija, 100, ulaz) != NULL) {
+		if (trenutnaPozicija != pozicija) {
+			fputs(linija, izlaz);
+		}
+		trenutnaPozicija = ftell(ulaz);
+	}
+
+	fclose(ulaz);
+	fclose(izlaz);
+
+	if (remove(imeDatKupci) != 0) {
+		printf("Pogreska pri brisanju datoteke %s.\n", imeDatKupci);
+		return;
+	}
+
+	if (rename("temp.txt", imeDatKupci) != 0) {										//18
+		printf("Pogreska pri preimenovanju datoteke temp.txt u %s.\n", imeDatKupci);
+		return;
+	}
+
+	printf("Kupac %s %s je uspjesno odjavljen.\n", ime, prezime);
 }
